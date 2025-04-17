@@ -3,6 +3,7 @@ package com.example.demo.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +21,8 @@ import jakarta.transaction.Transactional;
 // 조회는 데이터 영향이 없음
 // 하지만 추가나 삭제는 데이터 영향이 있음
 // sql 실행한 후에 commit을 해야 db에 결과가 반영됨
+
+// update 또는 delete => commit
 @Transactional
 public interface MemoRepository extends JpaRepository<Memo, Integer> {
 
@@ -49,7 +52,7 @@ public interface MemoRepository extends JpaRepository<Memo, Integer> {
 	
 	//메모의 번호를 기준으로 역정렬
 	// findAll : 전체 조회
-//	List<Memo> findAllOrderByNoDesc();
+	List<Memo> findAllByOrderByNoDesc();
 	
 	//  deleteMemoBy : 삭제
 	// LessThan : 비교연산자 <
@@ -78,7 +81,74 @@ public interface MemoRepository extends JpaRepository<Memo, Integer> {
 	// 결론 :
 	// 쿼리메소드/어노테이션(jqpl)/어노테이션(순수한sql)
 	
+	
+	/* JPQL 규칙
+	 * 1. 테이블 이름대신 엔티티 이름을 사용
+	 * 2. 컬럼명 대신 변수명을 사용
+	 * 3. 함수 이름은 자유롭게 사용
+	 */
+	// 내용이 없는 메모를 검색
+	// SPQL SQL은 실제 데이터베이스에 맞는 SQL로 변경됨
+	@Query("select m from Memo m where text is null")
+	List<Memo> get2();
+	
+	/*
+	 * JPQL 규칙
+	 * 1. 테이블 이름 대신 엔티티 이름을 사용
+	 * 2. 컬럼명 대신 변수명을 사용
+	 */
+	
+	// sql의 파라미터는 함수의 매개변수로 처리
+	// 파라미터를 작성하는 방법 : 변수명
+	// 10번에서 20번 사이의 메모 검색
+	// SELECT * FROM TBL_MEMO WHERE NO BETWEEN 10 AND 20;
+	@Query("select m from Memo m where no between :start and :end")
+	List<Memo> get3(@Param("start") int start, @Param("end") int end);
+	
+	
+	// 순수한 sql로 작성
+	
+	// value : sql
+	// nativeQuery : 순수 쿼리를 사용하는지 여부
+	// 번호를 기준으로 역정렬
+	@Query( value = "SELECT * FROM TBL_MEMO ORDER BY NO DESC", nativeQuery = true )
+	List<Memo> get4();
+	
+	
+	// 10~20 사이의 메모를 삭제
+	@Query( value = "DELETE FROM TBL_MEMO WHERE NO BETWEEN :start AND :end", nativeQuery = true)
+	void delete1(@Param("start") int start, @Param("end") int end);
+	
+	
+	// 객체 파라미터
+	// 파라미터를 Memo 객체로 전달
+	// 객체 파라미터 표기 : :#{}
+	// 객체 안에 프로퍼티 표기 => #객체.프로퍼티
+	@Modifying
+	@Query(value = "UPDATE TBL_MEMO SET text = :#{#memo.text} WHERE NO = :#{#memo.no}", nativeQuery = true)
+	int update1(@Param("memo")Memo memo);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
+
+
+
+
+
+/*
+ * 조건 검색 기능을 추가하는 방법
+ * 1. 쿼리 메소드
+ * 2. 어노테이션 (jqpl 문법)
+ * 3. 어노테이션 (순수한 sql)
+ * */
 
 
 

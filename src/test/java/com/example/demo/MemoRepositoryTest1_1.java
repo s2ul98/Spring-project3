@@ -240,6 +240,7 @@ public class MemoRepositoryTest1_1 {
 		   System.out.println(memo);
 	   }
    }
+   
    @Test
    public void 비교검색() {
 	   //번호가 10보다 작은 데이터를 검색
@@ -281,6 +282,72 @@ public class MemoRepositoryTest1_1 {
 		   System.out.println(memo);
 	   }
    }
+   
+   @Test
+   public void 쿼리어노테이션_테스트2() {
+	   // 텍스트가 없는 메모를 검색
+	   List<Memo> list = repository.get2();
+	   
+	   for(Memo memo : list) {
+		   System.out.println(memo);
+	   }
+   }
+   
+   @Test
+   public void 쿼리어노테이션_테스트3() {
+	   
+	   // 10~20번 사이 메모 검색
+	   List<Memo> list = repository.get3(10, 20);
+	   
+	   for(Memo memo : list) {
+		   System.out.println(memo);
+	   }
+   }
+   
+   @Test
+   public void 쿼리어노테이션_테스트4() {
+	   // 번호를 기준으로 역정렬
+	   List<Memo>list = repository.get4();
+	   
+	   for(Memo memo : list) {
+		   System.out.println(memo);
+	   }
+   }
+   
+   @Test
+   public void 쿼리어노테이션_테스트5() {
+	   
+	   // 10~20 사이의 메모를 삭제
+	   repository.delete1(10, 20);
+   }
+   
+   
+   @Test
+   public void 쿼리어노테이션_테스트6() {
+	   
+	   // 수정할 데이터 생성
+	   // 1번 데이터 조회
+	   Optional<Memo> optional = repository.findById(1);
+	   
+	   if(optional.isPresent()) {
+		   Memo memo = optional.get();
+		   memo.setText("수정");
+		   repository.update1(memo);
+	   }
+   }
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
    
    

@@ -18,5 +18,15 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
 	@Query(value = "SELECT * FROM tbl_book WHERE publisher IN (:publisher1,:publisher2)", nativeQuery = true)
 	List<Book> get3(@Param("publisher1") String publisher1, @Param("publisher2") String publisher2);
+	
+	@Query(value = "SELECT * FROM tbl_book WHERE title = :title", nativeQuery = true)
+	List<Book> findByTitle(@Param("title") String title);
+	
+	@Query(value = "SELECT * FROM tbl_book WHERE price >= :price AND publisher = :publisher", nativeQuery = true)
+	List<Book> findBooksByPriceAndPublisher(@Param("price") int price, @Param("publisher") String publisher);
+	
+	@Query(value = "SELECT * FROM tbl_book WHERE publisher IN (:publisher1, :publisher2)", nativeQuery = true)
+	List<Book> findByPublisher(@Param("publisher1") String publisher1, @Param("publisher2") String publisher2);
+
 
 }
